@@ -4,6 +4,7 @@ export interface GitHubProfile {
     public_repos: number;
     followers: number;
     following: number;
+    created_at: string;
     // Adicione mais campos conforme necessário
 }
 
@@ -11,6 +12,8 @@ export interface GitHubRepo {
     name: string;
     stargazers_count: number;
     forks_count: number;
+    language: string | null;
+    watchers_count: number;
     // Adicione mais
 }
 
@@ -19,7 +22,6 @@ export interface GitHubData {
     repos: GitHubRepo[];
     metrics: {
         totalRepos: number;
-        totalStars: number;
         totalForks: number;
         totalSize?: number;
         prOpened?: number;
@@ -30,9 +32,7 @@ export interface GitHubData {
         issueComments?: number;
         stargazers?: number;
         forks?: number;
-        watchers?: number;
         packages?: number;
-        languages?: string[];
         frameworks?: string[];
         databases?: string[];
     };

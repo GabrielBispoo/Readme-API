@@ -9,11 +9,14 @@ export function generateSVG(username: string, data: GitHubData): string {
 /_____/     \\/    \\/     \\/ 
 `.trim();
 
-  const repoList = data.repos.slice(0, 3).map(r => `├ ${r.name} (⭐ ${r.stargazers_count})`).join('\n');
 
-  const metrics = `Repos: ${data.metrics.totalRepos} | Stars: ${data.metrics.totalStars} | Forks: ${data.metrics.totalForks}`;
+  const profile = data.profile;
+  const repos = data.repos;
+
+  const repoList = data.repos.slice(0, 3).map(r => `├ ${r.name} (⭐ ${r.stargazers_count})`).join('\n');
   const activityBar = '█'.repeat(10); // Simplified bar for contributions, adjust based on data if available
-  const followers = data.metrics.followers || 883;
+  const registeredYears = Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 365));
+  const followers = profile.followers || 0;
   const totalRepos = data.metrics.totalRepos || 5;
   const totalSize = data.metrics.totalSize || '1.05 GB';
   const commits = data.metrics.commits || 1173;
@@ -21,15 +24,20 @@ export function generateSVG(username: string, data: GitHubData): string {
   const prOpened = data.metrics.prOpened || 7;
   const issuesOpened = data.metrics.issuesOpened || 82;
   const issueComments = data.metrics.issueComments || 135;
-  const stargazers = data.metrics.stargazers || 64;
-  const forks = data.metrics.forks || 8;
-  const watchers = data.metrics.watchers || 26;
+  const stargazers = data.metrics.stargazers || 0;
+  const forks = data.metrics.totalForks || 0;
+  // const watchers = repos.watchers_count || 26;
+  const watchers = data.repos.reduce((sum, r) => sum + r.watchers_count, 0);
   const packages = data.metrics.packages || 0;
 
   // Simplified languages, frameworks, db - based on data or defaults
-  const languages = (data.metrics.languages || ['JavaScript', 'TypeScript', 'PHP']).map((lang: string) =>
-    `<span class="bck-lan"><b class="icons">●</b> ${lang}</span>`
-  ).join('');
+
+  const languages = Array.from(
+    new Set(repos.map(r => r.language).filter(Boolean))
+  );
+  // const languages = (repos.languages || ['JavaScript', 'TypeScript', 'PHP']).map((lang: string) =>
+  //   `<span class="bck-lan"><b class="icons">●</b> ${lang}</span>`
+  // ).join('');
   const frameworks = (data.metrics.frameworks || ['Node.js', 'Vue.js', 'Laravel']).map((fw: string) =>
     `<span class="bck-lan"><b class="icons">●</b> ${fw}</span>`
   ).join('');
@@ -345,7 +353,7 @@ export function generateSVG(username: string, data: GitHubData): string {
 <code>
 ${asciiLogo}
 </code>
-<b>${username}</b> registered=3y, uid=3363, gid=2
+<b>${username}</b> registered=${registeredYears}y, uid=3363, gid=2
   contributed to ${totalRepos} repositories <b>${activityBar}</b>
   followed by <b>${followers}</b> users
 </div>
@@ -397,7 +405,7 @@ ${asciiLogo}
 </div>
 </div>
 </div>
-</div><div class="stdout">${metrics}
+</div><div class="stdout">
 <b>Total ${totalRepos} repositories - ${totalSize}</b>
 Projetos<span style="color: var(--color-calendar-halloween-graph-day-L1-bg);">/</span>
 ${repoList}

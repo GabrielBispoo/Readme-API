@@ -37,9 +37,14 @@ export async function fetchGitHubUser(username: string): Promise<GitHubData> {
     const repos = await fetchAllRepos(username);
 
     const metrics = {
+        registeredYears: Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24 * 365)),
         totalRepos: repos.length,
-        totalStars: repos.reduce((sum, r) => sum + r.stargazers_count, 0),
         totalForks: repos.reduce((sum, r) => sum + r.forks_count, 0),
+        stargazers: repos.reduce((sum, r) => sum + r.stargazers_count, 0),
+        forks: repos.reduce((sum, r) => sum + r.forks_count, 0),
+        watchers: repos.reduce((sum, r) => sum + r.watchers_count, 0),
+        languages: Array.from(new Set(repos.map(r => r.language).filter(Boolean))),
+        followers: profile.followers,
     };
 
     const data: GitHubData = { profile, repos, metrics };
